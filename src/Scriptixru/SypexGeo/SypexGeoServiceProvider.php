@@ -1,71 +1,47 @@
 <?php namespace Scriptixru\SypexGeo;
 
-use Illuminate\Support\ServiceProvider;
+use Bun\Core\Config\ConfigAwareInterface;
+use Bun\Core\Config\ConfigInterface;
 
-class SypexGeoServiceProvider extends ServiceProvider {
+/**
+ * Class SypexGeoServiceProvider
+ * @package Scriptixru\SypexGeo
+ */
+class SypexGeoServiceProvider implements ConfigAwareInterface
+{
+    /** @var ConfigInterface */
+    protected $config;
+    /** @var SypexGeo */
+    protected $sypex;
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    /**
+     * @param ConfigInterface $config
+     */
+    public function setConfig(ConfigInterface $config)
+    {
+        $this->config = $config;
+    }
 
-	/**
-	 * Bootstrap the application events.
-	 *
-	 * @return void
-	 */
-	public function boot()
-	{
-        $this->publishes([
-            __DIR__.'/../../config/sypexgeo.php' => config_path('sypexgeo.php'),
-        ]);
-	}
+    /**
+     * @return SypexGeo|void
+     */
+    public function getSypex()
+    {
+        if($this->sypex === null) {
+            $this->sypex = $this->initSypex();
+        }
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		// Register providers.
-		$this->app['sypexgeo'] = $this->app->share(function($app)
-		{
-            $sypexConfig = $app['config'];
-            $sypexConfigType = $sypexConfig->get('sypexgeo.sypexgeo.type', array());
-            $sypexConfigPath = $sypexConfig->get('sypexgeo.sypexgeo.path', array());
+        return $this->sypex;
+    }
 
-			switch ($sypexConfigType){
-                case ('database'):
-                    $sypexConfigFile = $sypexConfig->get('sypexgeo.sypexgeo.file', array());
-                    $sxgeo = new SxGeo(base_path().$sypexConfigPath.$sypexConfigFile);
-                    break;
-                case ('web_service'):
-                    $license_key = $sypexConfig->get('sypexgeo.sypexgeo.license_key', array());
-                    $sxgeo = new SxGeoHttp($license_key);
-                    break;
-                default:
-                    $sypexConfigFile = $sypexConfig->get('sypexgeo.sypexgeo.file', array());
-                    $sxgeo = new SxGeo(base_path().$sypexConfigPath.$sypexConfigFile);
-            }
+    protected function initSypex()
+    {
+        $geo = $this->config->get('sypexgeo.use_db') ?
+            new SxGeo($this->config->get('sypexgeo.db_path')) :
+            new SxGeoHttp($this->config->get('sypexgeo.licence_key'));
 
-			//return new GeoIP($app['config'], $app["session.store"]);
+        $sypex = new SypexGeo($geo, $this->config);
 
-
-            return new SypexGeo($sxgeo, $app['config']);
-		});
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array('sypexgeo');
-	}
-
+        return $sypex;
+    }
 }

@@ -1,24 +1,22 @@
 <?php namespace Scriptixru\SypexGeo;
 
+use Bun\Core\Config\ConfigInterface;
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-use Illuminate\Config\Repository;
-use Illuminate\Session\Store as SessionStore;
-use PhpParser\Node\Expr\Cast\Object_;
-
-class Sypexgeo
+/**
+ * Class SypexGeo
+ * @package Scriptixru\SypexGeo
+ */
+class SypexGeo
 {
     /**
-     * @var \SxGeo instance.
+     * @var SxGeoInterface instance.
      */
     private $_sypex = null;
 
     /**
      * Illuminate config repository instance.
      *
-     * @var \Illuminate\Config\Repository
+     * @var ConfigInterface
      */
     protected $config;
 
@@ -81,13 +79,22 @@ class Sypexgeo
      *   ]
      *  ```
      */
-    public function __construct($object, Repository $config){
-            $this->config  = $config;
-            $this->_sypex = $object;
-        }
+
+    /**
+     * @param $object
+     * @param \Bun\Core\Config\ConfigInterface $config
+     */
+    public function __construct(SxGeoInterface $object, ConfigInterface $config)
+    {
+        $this->config  = $config;
+        $this->_sypex = $object;
+    }
 
 
-
+    /**
+     * @param string $ip
+     * @return bool
+     */
     public function get($ip='')
     {
         if (empty($ip))

@@ -9,7 +9,17 @@
 namespace Scriptixru\SypexGeo;
 
 
-class SxGeoHttp {
+use Bun\Core\Config\ConfigAwareInterface;
+use Bun\Core\Config\ConfigInterface;
+
+/**
+ * Class SxGeoHttp
+ * @package Scriptixru\SypexGeo
+ */
+class SxGeoHttp implements SxGeoInterface, ConfigAwareInterface
+{
+    /** @var ConfigInterface */
+    protected $config;
 
     /**
      * @var string license key sypexgeo.net
@@ -30,18 +40,24 @@ class SxGeoHttp {
             $this->license_key  = $license_key;
             $this->license_key_path  = $license_key.'/';
         }
-
-
     }
+
+    /**
+     * @param ConfigInterface $config
+     */
+    public function setConfig(ConfigInterface $config)
+    {
+        $this->config = $config;
+    }
+
 
     /**
      * Метод возваращает данные полученные от api.sypexgeo.net
      * @param $ip
-     * @param $config
      * @return mixed
      */
-    public function getCityFull($ip, $config){
-        $view = $config->get('sypexgeo.sypexgeo.view', array());
+    public function getCityFull($ip){
+        $view = $this->config->get('sypexgeo.sypexgeo.view', array());
         $url = $this->get_path($view,$ip);
         $get_array = 'get_array_'.$view;
         $apiSypexGeo = $this->file_get_contents_url($url);
@@ -54,6 +70,10 @@ class SxGeoHttp {
      * @param string $url Строка с адресом к api.sypexgeo.net
      * @return $data Ответ api.sypexgeo.net
      */
+    /**
+     * @param $url
+     * @return string
+     */
     public function file_get_contents_url($url)
     {
         $data = file_get_contents($url);
@@ -64,7 +84,10 @@ class SxGeoHttp {
      * @param string $url Строка с адресом к api.sypexgeo.net
      * @return $data Ответ api.sypexgeo.net
      */
-
+    /**
+     * @param $url
+     * @return mixed
+     */
     public function file_get_contents_curl($url)
     {
         $ch = curl_init();
@@ -85,7 +108,6 @@ class SxGeoHttp {
      * @param $ip
      * @return string
      */
-
     public function get_path($view,$ip){
 
         return 'http://api.sypexgeo.net/'.$this->license_key_path.$view.'/'.$ip;

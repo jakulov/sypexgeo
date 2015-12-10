@@ -1,4 +1,5 @@
 <?php namespace Scriptixru\SypexGeo;
+
 /***************************************************************************\
 | Sypex Geo                  version 2.2.3                                  |
 | (c)2006-2014 zapimir       zapimir@zapimir.net       http://sypex.net/    |
@@ -13,7 +14,12 @@
 define ('SXGEO_FILE', 0);
 define ('SXGEO_MEMORY', 1);
 define ('SXGEO_BATCH',  2);
-class SxGeo {
+
+/**
+ * Class SxGeo
+ * @package Scriptixru\SypexGeo
+ */
+class SxGeo implements SxGeoInterface {
 	protected $fh;
 	protected $ip1c;
 	protected $info;
@@ -251,7 +257,7 @@ class SxGeo {
 				case 'b': $v = $val; $l++; break;
 			}
 			$pos += $l;
-			$unpacked[$name] = is_array($v) ? current($v) : $v;
+			$unpacked[$name] = (isset($v) && is_array($v)) ? current($v) : (isset($v) ? $v : null);
 		}
 		return $unpacked;
 	}
