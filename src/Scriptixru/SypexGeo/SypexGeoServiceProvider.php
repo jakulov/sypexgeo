@@ -39,6 +39,9 @@ class SypexGeoServiceProvider implements ConfigAwareInterface
         $geo = $this->config->get('sypexgeo.use_db') ?
             new SxGeo($this->config->get('sypexgeo.db_path')) :
             new SxGeoHttp($this->config->get('sypexgeo.licence_key'));
+        if($geo instanceof ConfigAwareInterface) {
+            $geo->setConfig($this->config);
+        }
 
         $sypex = new SypexGeo($geo, $this->config);
 
