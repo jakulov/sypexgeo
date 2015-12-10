@@ -1,12 +1,16 @@
 {
-    "name": "scriptixru/sypexgeo",
+    "name": "jakulov/sypexgeo",
     "description": "Supports GeoIP services (sypexgeo.net).",
-    "keywords": ["laravel", "laravel 5", "geoip", "location", "geolocation"],
+    "keywords": ["Bun Framework", "bun", "geoip", "location", "geolocation"],
 	"license": "BSD 2-Clause",
     "authors": [
         {
             "name": "Varchak Valery",
             "email": "scriptixru@gmail.com"
+        },
+        {
+            "name": "Yakov Akulov",
+            "email": "jakulov@gmail.com"
         }
     ],
     "require": {
